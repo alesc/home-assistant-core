@@ -28,6 +28,16 @@ ERROR_MSG = [
     b"The subscription does not support SSML!",
 ]
 
+_OPTIONS = {
+    "voice": "v",
+    "rate": "r",
+}
+
+SUPPORT_OPTIONS = [
+    "voice",
+    "rate",
+]
+
 SUPPORT_LANGUAGES = [
     "ar-eg",
     "ar-sa",
@@ -187,6 +197,11 @@ class VoiceRSSProvider(Provider):
         """Return list of supported languages."""
         return SUPPORT_LANGUAGES
 
+    @property
+    def supported_options(self):
+        """Return list of supported options."""
+        return SUPPORT_OPTIONS
+
     async def async_get_tts_audio(self, message, language, options=None):
         """Load TTS from VoiceRSS."""
         websession = async_get_clientsession(self.hass)
@@ -194,6 +209,9 @@ class VoiceRSSProvider(Provider):
 
         form_data["src"] = message
         form_data["hl"] = language
+
+        for key, value in options.items():
+            form_data[_OPTIONS[key]] = value
 
         try:
             async with async_timeout.timeout(10):
